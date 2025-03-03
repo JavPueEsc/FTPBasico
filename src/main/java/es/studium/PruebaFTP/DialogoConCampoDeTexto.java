@@ -15,7 +15,16 @@ public class DialogoConCampoDeTexto extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JLabel lblMensaje;
-	private JTextField textField;
+	private JTextField txtIntroducir;
+	public JTextField getTxtIntroducir() {
+		return txtIntroducir;
+	}
+	public void setTxtIntroducir(JTextField txtIntroducir) {
+		this.txtIntroducir = txtIntroducir;
+	}
+	public void setResultado(String resultado) {
+		this.resultado = resultado;
+	}
 	private String mensaje;
 	private String nombreACambiar;
 	private String resultado;
@@ -51,25 +60,25 @@ public class DialogoConCampoDeTexto extends JDialog {
 			contentPanel.add(lblMensaje);
 		}
 		
-		textField = new JTextField();
-		textField.setText(nombreACambiar);
-		textField.setBounds(62, 38, 200, 23);
-		contentPanel.add(textField);
-		textField.setColumns(10);
+		txtIntroducir = new JTextField();
+		txtIntroducir.setText(nombreACambiar);
+		txtIntroducir.setBounds(62, 38, 221, 23);
+		contentPanel.add(txtIntroducir);
+		txtIntroducir.setColumns(10);
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setBounds(62, 70, 200, 33);
+			buttonPane.setBounds(62, 70, 221, 33);
 			contentPanel.add(buttonPane);
 			buttonPane.setLayout(null);
 			{
 				JButton okButton = new JButton("Aceptar");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						resultado = textField.getText(); // Guarda el texto ingresado
+						resultado = txtIntroducir.getText(); // Guarda el texto ingresado
 			            dispose();
 					}
 				});
-				okButton.setBounds(10, 5, 87, 23);
+				okButton.setBounds(10, 5, 100, 23);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
@@ -82,7 +91,7 @@ public class DialogoConCampoDeTexto extends JDialog {
 			            dispose();
 					}
 				});
-				cancelButton.setBounds(118, 5, 65, 23);
+				cancelButton.setBounds(115, 5, 100, 23);
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
