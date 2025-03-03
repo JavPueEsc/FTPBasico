@@ -321,43 +321,59 @@ public class ClienteFTPBasico extends JFrame
 				} // final del if
 			}
 		}); // final del bot�n CreaDir
+		
+		//4. Gestinar botón de borrado de carpetas; primero se implementa que el nombre de la carpeta aparezca en el cuadro de dialogo
+		//4.1 Control de errores: controlar que se haya seleccionado una carpeta
+		//4.2 controlar cuando se intenta eliminar un fichero con este botón.
 		botonDelDir.addActionListener(new ActionListener() 
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String nombreCarpeta = JOptionPane.showInputDialog(null,"Introduce el nombre del directorio a eliminar","carpeta");
-				if (!(nombreCarpeta==null)) 
-				{
-					String directorio = direcSelec;
-					if (!direcSelec.equals("/"))
-						directorio = directorio + "/";
-					//nombre del directorio a eliminar
-					directorio += nombreCarpeta.trim(); //quita blancos a derecha y a izquierda
-					try 
+				String nombreDeCarpetaAeliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
+				String nombreFicheroSeleccionado = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
+				
+				if(txtArbolDirectoriosConstruido.getText().contains("(DIR) ")) {
+								
+					String nombreCarpeta = JOptionPane.showInputDialog(null,"Introduce el nombre del directorio a eliminar",nombreDeCarpetaAeliminar);
+					if (!(nombreCarpeta==null)) 
 					{
-						if(cliente.removeDirectory(directorio)) 
+						String directorio = direcSelec;
+						if (!direcSelec.equals("/"))
+							directorio = directorio + "/";
+						//nombre del directorio a eliminar
+						directorio += nombreCarpeta.trim(); //quita blancos a derecha y a izquierda
+						try 
 						{
-							String m = nombreCarpeta.trim()+" => Se ha eliminado correctamente ...";
-							JOptionPane.showMessageDialog(null, m);
-							txtArbolDirectoriosConstruido.setText(m);
-							//directorio de trabajo actual
-							cliente.changeWorkingDirectory(direcSelec);
-							FTPFile[] ff2 = null;
-							//obtener ficheros del directorio actual
-							ff2 = cliente.listFiles();
-							//llenar la lista
-							llenarLista(ff2, direcSelec);
+							if(cliente.removeDirectory(directorio)) 
+							{
+								String m = nombreCarpeta.trim()+" => Se ha eliminado correctamente ...";
+								JOptionPane.showMessageDialog(null, m);
+								txtArbolDirectoriosConstruido.setText(m);
+								//directorio de trabajo actual
+								cliente.changeWorkingDirectory(direcSelec);
+								FTPFile[] ff2 = null;
+								//obtener ficheros del directorio actual
+								ff2 = cliente.listFiles();
+								//llenar la lista
+								llenarLista(ff2, direcSelec);
+							}
+							else
+								JOptionPane.showMessageDialog(null, nombreCarpeta.trim() + " => No se ha podido eliminar ...");
 						}
-						else
-							JOptionPane.showMessageDialog(null, nombreCarpeta.trim() + " => No se ha podido eliminar ...");
-					}
-					catch (IOException e1)
-					{
-						e1.printStackTrace();
-					}
-				} 
-				// final del if
+						catch (IOException e1)
+						{
+							e1.printStackTrace();
+						}
+					} 
+					// final del if
+				}
+				else if(txtArbolDirectoriosConstruido.getText().contains("FICHERO SELECCIONADO")){
+					JOptionPane.showMessageDialog(null, "No se ha podido eliminar '"+nombreFicheroSeleccionado+"' porque no es una carpeta.");	
+				}
+				else {
+				JOptionPane.showMessageDialog(null, "Debe seleccionar una carpeta.");
+				}
 			}
 		}); 
 		//final del bot�n Eliminar Carpeta
@@ -413,6 +429,10 @@ public class ClienteFTPBasico extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
+				
+				String nombreDeCarpetaSeleccionada = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
+				String nombreFicheroAEliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
+
 				String directorio = direcSelec;
 				if (!direcSelec.equals("/"))
 					directorio = directorio + "/";
