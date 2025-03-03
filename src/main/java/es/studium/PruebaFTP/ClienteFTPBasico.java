@@ -254,7 +254,7 @@ public class ClienteFTPBasico extends JFrame {
 							}
 						} else {
 							// System.out.println("No es un directorio");
-							JOptionPane.showMessageDialog(null, "No es un directorio");
+							JOptionPane.showMessageDialog(null, "No es una carpeta. Si es posible el fichero se \nabrirá con la aplicación asignada por defecto.");
 
 							String rutaCarpetaServidor = "C:\\Users\\dekad\\Desktop\\GrupoStudium\\3. Segundo DAM\\3. Programación de servicios y procesos\\4. Tema 4. Generación de servicios en Red\\practicaPSPT4";
 
