@@ -433,13 +433,22 @@ public class ClienteFTPBasico extends JFrame
 				String nombreDeCarpetaSeleccionada = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
 				String nombreFicheroAEliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
 
-				String directorio = direcSelec;
-				if (!direcSelec.equals("/"))
-					directorio = directorio + "/";
-				if (!direcSelec.equals("")) 
-				{
-					BorrarFichero(directorio + ficheroSelec,ficheroSelec);
+				if(txtArbolDirectoriosConstruido.getText().contains("(DIR) ")) {
+					JOptionPane.showMessageDialog(null, "No se ha podido eliminar '"+nombreDeCarpetaSeleccionada+"' porque no es un fichero.");
 				}
+				else if(txtArbolDirectoriosConstruido.getText().contains("FICHERO SELECCIONADO")){
+					String directorio = direcSelec;
+					if (!direcSelec.equals("/"))
+						directorio = directorio + "/";
+					if (!direcSelec.equals("")) 
+					{
+						BorrarFichero(directorio + ficheroSelec,nombreFicheroAEliminar);
+					}		
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Debe seleccionar un fichero.");
+				}
+				
 			}
 		});
 	} // fin constructor
@@ -555,7 +564,7 @@ public class ClienteFTPBasico extends JFrame
 	private void BorrarFichero(String NombreCompleto, String nombreFichero) 
 	{
 		//pide confirmaci�n
-		int seleccion = JOptionPane.showConfirmDialog(null, "�Desea eliminar el fichero seleccionado?");
+		int seleccion = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el fichero '"+nombreFichero+"'?");
 		if (seleccion == JOptionPane.OK_OPTION) 
 		{
 			try 
