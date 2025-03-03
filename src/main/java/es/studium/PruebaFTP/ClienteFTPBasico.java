@@ -33,6 +33,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import javax.swing.JLabel;
+import javax.swing.JSeparator;
 
 public class ClienteFTPBasico extends JFrame 
 {
@@ -66,6 +67,10 @@ public class ClienteFTPBasico extends JFrame
 	static String direcSelec = direcInicial;
 	static String ficheroSelec = "";
 	private JButton botonVolver;
+	private JButton botonRenombrarCarpeta;
+	private JButton botonRenombrarFichero;
+	
+	private final String MENSAJE_RENOMBRAR_CARPETA = "¿Con qué nombre desea renombrar la carpeta?";
 	public static void main(String[] args) throws IOException 
 	{
 		new ClienteFTPBasico();
@@ -92,6 +97,7 @@ public class ClienteFTPBasico extends JFrame
 		txtArbolDirectoriosConstruido.setText("<< ARBOL DE DIRECTORIOS CONSTRUIDO >>");
 		txtDirectorioRaiz.setBounds(37, 430, 335, 23);
 		txtDirectorioRaiz.setText("DIRECTORIO RAIZ: "+direcInicial);
+		txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + direcSelec);
 		getContentPane().setLayout(null);
 		//Preparaci�n de la lista
 		//se configura el tipo de selecci�n para que solo se pueda
@@ -113,22 +119,22 @@ public class ClienteFTPBasico extends JFrame
 		c.add(txtArbolDirectoriosConstruido);
 		txtActualizarArbol.setBounds(37, 495, 335, 23);
 		c.add(txtActualizarArbol);
-		botonCargar.setBounds(394, 211, 150, 23);
+		botonCargar.setBounds(394, 219, 150, 23);
 		c.add(botonCargar);
 		botonCreaDir.setBounds(394, 24, 150, 23);
 		c.add(botonCreaDir);
-		botonDelDir.setBounds(394, 58, 150, 23);
+		botonDelDir.setBounds(394, 96, 150, 23);
 		c.add(botonDelDir);
-		botonDescargar.setBounds(394, 245, 150, 23);
+		botonDescargar.setBounds(394, 255, 150, 23);
 		c.add(botonDescargar);
-		botonBorrar.setBounds(394, 279, 150, 23);
+		botonBorrar.setBounds(394, 291, 150, 23);
 		c.add(botonBorrar);
-		botonSalir.setBounds(394, 341, 150, 23);
+		botonSalir.setBounds(394, 342, 150, 23);
 		c.add(botonSalir);
 		c.setLayout(null);
 		
 		botonVolver = new JButton("Volver");
-		botonVolver.setBounds(394, 134, 150, 23);
+		botonVolver.setBounds(394, 132, 150, 23);
 		getContentPane().add(botonVolver);
 		
 		JLabel lblNewLabel = new JLabel("txtDirectorioRaiz");
@@ -142,9 +148,26 @@ public class ClienteFTPBasico extends JFrame
 		JLabel lblTxtactualizararbol = new JLabel("txtActualizarArbol");
 		lblTxtactualizararbol.setBounds(382, 499, 150, 14);
 		getContentPane().add(lblTxtactualizararbol);
+		
+		botonRenombrarCarpeta = new JButton("Renombrar carpeta");
+		botonRenombrarCarpeta.setBounds(394, 60, 150, 23);
+		getContentPane().add(botonRenombrarCarpeta);
+		
+		botonRenombrarFichero = new JButton("Renombrar fichero");
+		botonRenombrarFichero.setBounds(394, 183, 150, 23);
+		getContentPane().add(botonRenombrarFichero);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(394, 168, 150, 2);
+		getContentPane().add(separator);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(394, 327, 150, 2);
+		getContentPane().add(separator_1);
 		//se a�aden el resto de los campos de pantalla
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(588,569);
+		setResizable(false);
 		setVisible(true);
 		//Acciones al pulsar en la lista o en los botones
 		listaDirec.addListSelectionListener(new ListSelectionListener()
@@ -330,11 +353,10 @@ public class ClienteFTPBasico extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				String nombreDeCarpetaAeliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
-				String nombreFicheroSeleccionado = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
-				
-				if(txtArbolDirectoriosConstruido.getText().contains("(DIR) ")) {
-								
+				if(esCarpeta(txtArbolDirectoriosConstruido.getText(), "eliminar")) {
+					
+					String nombreDeCarpetaAeliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
+					
 					String nombreCarpeta = JOptionPane.showInputDialog(null,"Introduce el nombre del directorio a eliminar",nombreDeCarpetaAeliminar);
 					if (!(nombreCarpeta==null)) 
 					{
@@ -367,12 +389,6 @@ public class ClienteFTPBasico extends JFrame
 						}
 					} 
 					// final del if
-				}
-				else if(txtArbolDirectoriosConstruido.getText().contains("FICHERO SELECCIONADO")){
-					JOptionPane.showMessageDialog(null, "No se ha podido eliminar '"+nombreFicheroSeleccionado+"' porque no es una carpeta.");	
-				}
-				else {
-				JOptionPane.showMessageDialog(null, "Debe seleccionar una carpeta.");
 				}
 			}
 		}); 
@@ -424,19 +440,19 @@ public class ClienteFTPBasico extends JFrame
 				}
 			}
 		}); // Fin bot�n descargar
+		
+		//5. Gestinar botón de borrado de ficheros; primero se implementa que el nombre de la carpeta aparezca en el cuadro de dialogo
+		//5.1 Control de errores: controlar que se haya seleccionado un fichero
+		//5.2 controlar cuando se intenta eliminar una carpeta con este botón.
 		botonBorrar.addActionListener(new ActionListener() 
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				
-				String nombreDeCarpetaSeleccionada = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
-				String nombreFicheroAEliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
-
-				if(txtArbolDirectoriosConstruido.getText().contains("(DIR) ")) {
-					JOptionPane.showMessageDialog(null, "No se ha podido eliminar '"+nombreDeCarpetaSeleccionada+"' porque no es un fichero.");
-				}
-				else if(txtArbolDirectoriosConstruido.getText().contains("FICHERO SELECCIONADO")){
+				if(esFichero(txtArbolDirectoriosConstruido.getText())){
+					String nombreFicheroAEliminar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: ", "");
+					
 					String directorio = direcSelec;
 					if (!direcSelec.equals("/"))
 						directorio = directorio + "/";
@@ -445,13 +461,91 @@ public class ClienteFTPBasico extends JFrame
 						BorrarFichero(directorio + ficheroSelec,nombreFicheroAEliminar);
 					}		
 				}
-				else {
-					JOptionPane.showMessageDialog(null, "Debe seleccionar un fichero.");
+			}
+		});
+		//6. Renombrar carpetas
+		botonRenombrarCarpeta.addActionListener(new ActionListener() 
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if(esCarpeta(txtArbolDirectoriosConstruido.getText(),"renombrar")) {
+					String nombreCarpetaARenombrar = txtArbolDirectoriosConstruido.getText().replace("FICHERO SELECCIONADO: (DIR) ", "");
+					DialogoConCampoDeTexto dialogo = new DialogoConCampoDeTexto(MENSAJE_RENOMBRAR_CARPETA,nombreCarpetaARenombrar);
+					String nuevoNombreCarpeta = dialogo.getResultado();
+					
+					String rutaActual = txtActualizarArbol.getText().replace("DIRECTORIO ACTUAL: ", "")+nombreCarpetaARenombrar;
+					String nuevaRuta = rutaActual.replace(nombreCarpetaARenombrar, nuevoNombreCarpeta);
+					System.out.println(rutaActual);
+					System.out.println(nuevaRuta);
+					
+					if(nuevoNombreCarpeta.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "No es posible dejar el nombre de una carpeta vacía.");
+					}
+					else if(nuevoNombreCarpeta.equals(nombreCarpetaARenombrar)){
+						JOptionPane.showMessageDialog(null, "Ha introducido elmismo nombre de carpeta");
+					}
+					else {
+						try {
+							
+							if (cliente.rename(rutaActual, nuevaRuta)) 
+							{
+								String m = "Carpeta "+nuevoNombreCarpeta + " => Renombrada correctamente... ";
+								JOptionPane.showMessageDialog(null, m);
+								txtArbolDirectoriosConstruido.setText(m);
+								//directorio de trabajo actual
+								cliente.changeWorkingDirectory(direcSelec);
+								FTPFile[] ff2 = null;
+								//obtener ficheros del directorio actual
+								ff2 = cliente.listFiles();
+								//llenar la lista con los ficheros del directorio actual
+								llenarLista(ff2, direcSelec);
+							}
+							else {
+								JOptionPane.showMessageDialog(null, nombreCarpetaARenombrar + " => No se ha podido renombrar ...");
+						}
+						}
+						catch (IOException ex) {
+					        ex.printStackTrace();
+					        System.out.println("Error de conexión FTP: " + ex.getMessage());				       
+					    }
+					}					
 				}
-				
 			}
 		});
 	} // fin constructor
+	
+	public boolean esCarpeta(String elementoSeleccionado, String accion) {
+		
+		if(elementoSeleccionado.contains("(DIR)")) {
+			return true;
+		}
+		else if (elementoSeleccionado.contains("FICHERO SELECCIONADO")) {
+			String ficheroSeleccionado = elementoSeleccionado.replace("FICHERO SELECCIONADO: ", "");
+			JOptionPane.showMessageDialog(null, "No se ha podido "+accion+"  '"+ficheroSeleccionado+"' porque no es una carpeta.");
+			return false;
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Debe seleccionar una carpeta.");
+			return false;
+		}
+	}
+	
+public boolean esFichero(String elementoSeleccionado) {
+		
+		if(elementoSeleccionado.contains("(DIR)")) {
+			String ficheroSeleccionado = elementoSeleccionado.replace("FICHERO SELECCIONADO: (DIR) ", "");
+			JOptionPane.showMessageDialog(null, "No se ha podido eliminar '"+ficheroSeleccionado+"' porque no es un fichero.");
+			return false;
+		}
+		else if (elementoSeleccionado.contains("FICHERO SELECCIONADO")) {
+			return true;
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Debe seleccionar un fichero.");
+			return false;
+		}
+	}
 	
 	private static void llenarLista(FTPFile[] files,String direc2) 
 	{
@@ -514,7 +608,7 @@ public class ClienteFTPBasico extends JFrame
 		{
 			String s = " " + soloNombre + " => Subido correctamente...";
 			txtArbolDirectoriosConstruido.setText(s);
-			txtActualizarArbol.setText("Se va a actualizar el �rbol de directorios...");
+			//txtActualizarArbol.setText("Se va a actualizar el �rbol de directorios...");
 			JOptionPane.showMessageDialog(null, s);
 			FTPFile[] ff2 = null;
 			//obtener ficheros del directorio actual
